@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <AppHeader />
   <!-- Introduction -->
   <section class="mb-8 py-20 text-white text-center relative">
     <div
@@ -271,12 +271,23 @@
 </template>
 
 <script>
-import Header from "./components/Header.vue";
+import { mapWritableState } from "pinia";
+import AppHeader from "./components/AppHeader.vue";
 import Auth from "./components/Auth.vue";
+import useUserStore from "@/stores/user";
+import { auth } from "@/includes/firebase";
 
 export default {
   name: "App",
-  components: { Header, Auth },
+  components: { AppHeader, Auth },
+  computed: {
+    ...mapWritableState(useUserStore, ["userLoggedIn"]),
+  },
+  created() {
+    if (auth.currentUser) {
+      this.userLoggedIn = true;
+    }
+  },
 };
 </script>
 
