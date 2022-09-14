@@ -3,7 +3,7 @@
   <section class="container mx-auto mt-6">
     <div class="md:grid md:grid-cols-3 md:gap-4">
       <div class="col-span-1">
-        <AppUpload ref="upload" />
+        <AppUpload ref="upload" :addSong="addSong" />
       </div>
       <div class="col-span-2">
         <div
@@ -53,20 +53,21 @@ export default {
     removeSong(i) {
       this.songs.splice(i, 1);
     },
-  },
-  async created() {
-    const snapshot = await songsCollection
-      .where("uid", "==", auth.currentUser.uid)
-      .get();
-
-    snapshot.forEach((document) => {
+    addSong(document) {
       const song = {
         ...document.data(),
         docID: document.id,
       };
 
       this.songs.push(song);
-    });
+    },
+  },
+  async created() {
+    const snapshot = await songsCollection
+      .where("uid", "==", auth.currentUser.uid)
+      .get();
+
+    snapshot.forEach(this.addSong);
   },
   // beforeRouteEnter(to, from, next) {
   //   const store = useUserStore();
