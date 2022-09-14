@@ -23,6 +23,7 @@
               :updateSong="updateSong"
               :index="i"
               :removeSong="removeSong"
+              :updateUnsavedFlag="updateUnsavedFlag"
             />
           </div>
         </div>
@@ -43,6 +44,7 @@ export default {
   data() {
     return {
       songs: [],
+      unsavedFlag: false,
     };
   },
   methods: {
@@ -61,6 +63,9 @@ export default {
 
       this.songs.push(song);
     },
+    updateUnsavedFlag(value) {
+      this.unsavedFlag = value;
+    },
   },
   async created() {
     const snapshot = await songsCollection
@@ -68,6 +73,16 @@ export default {
       .get();
 
     snapshot.forEach(this.addSong);
+  },
+  beforeRouteLeave(to, from, next) {
+    if (!this.unsavedFlag) {
+      next();
+    } else {
+      const leave = confirm(
+        "You have unsaved changes. Are you sure you want to leave?"
+      );
+      next(leave);
+    }
   },
   // beforeRouteEnter(to, from, next) {
   //   const store = useUserStore();
