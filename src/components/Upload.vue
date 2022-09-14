@@ -15,7 +15,7 @@
         @dragover.prevent.stop="isDragover = true"
         @draenter.prevent.stop="isDragover = true"
         @dragleave.prevent.stop="isDragover = false"
-        @drop.prevent.stop="upload"
+        @drop.prevent.stop="upload($event)"
       >
         <h5>Drop your files here</h5>
       </div>
@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { storage } from "@/includes/firebase";
 export default {
   name: "Upload",
   data() {
@@ -63,8 +64,21 @@ export default {
     };
   },
   methods: {
-    upload() {
+    upload($event) {
       this.isDragover = false;
+
+      const files = [...$event.dataTransfer.files];
+
+      files.forEach((file) => {
+        if (file.type !== "audio/mpeg") {
+          return;
+        }
+
+        const storageRef = storage.ref(); // music-application-d7c4c.appspot.com
+        const songsRef = storageRef.child(`songs/${file.name}`); // music-application-d7c4c.appspot.com/songs/example.mp3
+        songsRef.put(file);
+      });
+      console.log(files);
     },
   },
 };
