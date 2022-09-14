@@ -17,9 +17,11 @@
           </div>
           <div class="p-6">
             <CompositionItem
-              v-for="song in songs"
+              v-for="(song, i) in songs"
               :key="song.docID"
               :song="song"
+              :updateSong="updateSong"
+              :index="i"
             />
           </div>
         </div>
@@ -41,6 +43,12 @@ export default {
     return {
       songs: [],
     };
+  },
+  methods: {
+    updateSong(i, values) {
+      this.songs[i].modifiedName = values.modifiedName;
+      this.songs[i].genre = values.genre;
+    },
   },
   async created() {
     const snapshot = await songsCollection
