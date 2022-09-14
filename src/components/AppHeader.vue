@@ -26,8 +26,8 @@
           </li>
           <template v-else>
             <li>
-              <router-link class="px-2 text-white" :to="{ name: 'Manage' }"
-                >Manage</router-link
+              <router-link class="px-2 text-white" :to="{ name: 'Manage' }">
+                Manage</router-link
               >
             </li>
             <li>

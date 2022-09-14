@@ -178,7 +178,19 @@
 </template>
 
 <script>
-export default {};
+import useUserStore from "@/stores/user";
+
+export default {
+  name: "manage",
+  beforeRouteEnter(to, from, next) {
+    const store = useUserStore();
+    if (store.userLoggedIn) {
+      next();
+    } else {
+      next({ name: "Home" });
+    }
+  },
+};
 </script>
 
 <style></style>
