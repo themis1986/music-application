@@ -21,32 +21,17 @@
       </div>
       <hr class="my-6" />
       <!-- Progess Bars -->
-      <div class="mb-4">
+      <div class="mb-4" v-for="upload in uploads" :key="upload.name">
         <!-- File Name -->
-        <div class="font-bold text-sm">Just another song.mp3</div>
+        <div class="font-bold text-sm" :class="upload.textClass">
+          <i :class="upload.icon"></i> {{ upload.name }}
+        </div>
         <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
           <!-- Inner Progress Bar -->
           <div
-            class="transition-all progress-bar bg-blue-400"
-            style="width: 75%"
-          ></div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <div class="font-bold text-sm">Just another song.mp3</div>
-        <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-          <div
-            class="transition-all progress-bar bg-blue-400"
-            style="width: 35%"
-          ></div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <div class="font-bold text-sm">Just another song.mp3</div>
-        <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-          <div
-            class="transition-all progress-bar bg-blue-400"
-            style="width: 55%"
+            class="transition-all progress-bar"
+            :class="upload.variant"
+            :style="{ width: upload.currentProgress + '%' }"
           ></div>
         </div>
       </div>
@@ -61,6 +46,7 @@ export default {
   data() {
     return {
       isDragover: false,
+      uploads: [],
     };
   },
   methods: {
@@ -76,8 +62,40 @@ export default {
 
         const storageRef = storage.ref(); // music-application-d7c4c.appspot.com
         const songsRef = storageRef.child(`songs/${file.name}`); // music-application-d7c4c.appspot.com/songs/example.mp3
-        songsRef.put(file);
+        const task = songsRef.put(file);
+
+        const uploadIndex =
+          this.uploads.push({
+            task,
+            currentProgress: 0,
+            name: file.name,
+            variant: "bg-blue-400",
+            icon: "fas fa-spinner fa-spin",
+            textClass: "",
+          }) - 1;
+
+        task.on(
+          "state-changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+            this.uploads[uploadIndex].currentProgress = progress;
+          },
+          (error) => {
+            this.uploads[uploadIndex].variant = "bg-red-400";
+            this.uploads[uploadIndex].icon = "fas fa-times";
+            this.uploads[uploadIndex].textClass = "text-red-400";
+            console.log(error);
+          },
+          () => {
+            this.uploads[uploadIndex].variant = "bg-green-400";
+            this.uploads[uploadIndex].icon = "fas fa-check";
+            this.uploads[uploadIndex].textClass = "text-green-400";
+          }
+        );
       });
+
       console.log(files);
     },
   },
