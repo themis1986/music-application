@@ -8,6 +8,14 @@
       <!-- Upload Dropbox -->
       <div
         class="w-full px-10 py-20 rounded text-center cursor-pointer border border-dashed border-gray-400 text-gray-400 transition duration-500 hover:text-white hover:bg-green-400 hover:border-green-400 hover:border-solid"
+        :class="{ 'bg-green-400 border-green-400 borfer-solid': isDragover }"
+        @drag.prevent.stop=""
+        @dragstart.prevent.stop=""
+        @dragend.prevent.stop="isDragover = false"
+        @dragover.prevent.stop="isDragover = true"
+        @draenter.prevent.stop="isDragover = true"
+        @dragleave.prevent.stop="isDragover = false"
+        @drop.prevent.stop="upload"
       >
         <h5>Drop your files here</h5>
       </div>
@@ -49,6 +57,16 @@
 <script>
 export default {
   name: "Upload",
+  data() {
+    return {
+      isDragover: false,
+    };
+  },
+  methods: {
+    upload() {
+      this.isDragover = false;
+    },
+  },
 };
 </script>
 
