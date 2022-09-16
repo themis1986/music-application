@@ -8,9 +8,14 @@ export default defineStore("player", {
     sound: {},
     seek: "00:00",
     duration: "00:00",
+    playerProgress: "0%",
   }),
   actions: {
     async newSong(song) {
+      if (this.sound instanceof Howl) {
+        this.sound.unload();
+      }
+
       this.currentSong = song;
 
       this.sound = new Howl({
@@ -28,6 +33,10 @@ export default defineStore("player", {
       this.seek = helper.formatTime(this.sound.seek());
       this.duration = helper.formatTime(this.sound.duration());
 
+      this.playerProgress = `${
+        (this.sound.seek() / this.sound.duration()) * 100
+      }%`;
+
       if (this.sound.playing()) {
         requestAnimationFrame(this.progress);
       }
@@ -42,6 +51,20 @@ export default defineStore("player", {
       } else {
         this.sound.play();
       }
+    },
+    updateSeek(event) {
+      if (!this.sound.playing) {
+        return;
+      }
+      const { x, width } = event.currentTarget.getBoundingClientRect();
+      // Document = 2000px, Timeline = 1000px, clickX = 1000px not 500px, Distnance = 500
+      const clickX = event.clientX - x;
+      const percentage = clickX / width;
+      const seconds = this.sound.duration() * percentage;
+
+      this.sound.seek(seconds);
+      // this.sound.once("seek", this.progress);
+      this.progress;
     },
   },
   getters: {

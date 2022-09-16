@@ -8,11 +8,20 @@
     <div class="container mx-auto flex items-center">
       <!-- Play/Pause Button -->
       <button
+        v-if="!playing"
         @click.prevent="newSong(song)"
         type="button"
         class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
       >
-        <i class="fas fa-play"></i>
+        <i class="fas fa-play" v-if="!playing"></i>
+      </button>
+      <button
+        v-else
+        @click.prevent="toggleAudio"
+        type="button"
+        class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
+      >
+        <i class="fas fa-pause"></i>
       </button>
       <div class="z-50 text-left ml-8">
         <!-- Song Info -->
@@ -112,6 +121,7 @@ export default {
   },
   computed: {
     ...mapState(useUserStore, ["userLoggedIn"]),
+    ...mapState(usePlayerStore, ["playing"]),
     sortedComments() {
       return this.comments.slice().sort((a, b) => {
         if (this.sort === "1") {
@@ -135,7 +145,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(usePlayerStore, ["newSong"]),
+    ...mapActions(usePlayerStore, ["newSong", "toggleAudio"]),
     async getComments() {
       const snapshots = await commentsCollection
         .where("sid", "==", this.$route.params.id)
